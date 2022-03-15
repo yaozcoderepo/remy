@@ -8,16 +8,20 @@
 class Poisson
 {
 private:
-  std::poisson_distribution<> distribution;
+    std::poisson_distribution<> distribution;
 
-  PRNG & prng;
+    PRNG &prng;
 
 public:
-  Poisson( const double & rate, PRNG & s_prng ) : distribution( rate ), prng( s_prng ) {}
+    Poisson(const double &rate, PRNG &s_prng) : distribution(rate), prng(s_prng) {}
 
-  int sample( void ) { return distribution( prng ); }
+    int sample(void) { return distribution(prng); }
 
-  Poisson & operator=( const Poisson & ) { assert( false ); return *this; }
+    Poisson &operator=(const Poisson &)
+    {
+        assert(false);
+        return *this;
+    }
 };
 
 #endif
