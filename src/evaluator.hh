@@ -15,44 +15,44 @@ template <typename T>
 class Evaluator
 {
 public:
-  class Outcome
-  {
-  public:
-    double score;
-    std::vector< std::pair< NetConfig, std::vector< std::pair< double, double > > > > throughputs_delays;
-    T used_actions;
+    class Outcome
+    {
+    public:
+        double score;
+        std::vector<std::pair<NetConfig, std::vector<std::pair<double, double>>>> throughputs_delays;
+        T used_actions;
 
-    Outcome() : score( 0 ), throughputs_delays(), used_actions() {}
+        Outcome() : score(0), throughputs_delays(), used_actions() {}
 
-    Outcome( const AnswerBuffers::Outcome & dna );
+        Outcome(const AnswerBuffers::Outcome &dna);
 
-    AnswerBuffers::Outcome DNA( void ) const;
-  };
+        AnswerBuffers::Outcome DNA(void) const;
+    };
 
 private:
-  const unsigned int _prng_seed;
-  unsigned int _tick_count;
+    const unsigned int _prng_seed;
+    unsigned int _tick_count;
 
-  std::vector< NetConfig > _configs;
+    std::vector<NetConfig> _configs;
 
-  ProblemBuffers::Problem _ProblemSettings_DNA ( void ) const;
+    ProblemBuffers::Problem _ProblemSettings_DNA(void) const;
 
 public:
-  Evaluator( const ConfigRange & range );
-  
-  ProblemBuffers::Problem DNA( const T & actions ) const;
+    Evaluator(const ConfigRange &range);
 
-  Outcome score( T & run_actions,
-		const bool trace = false,
-		const double carefulness = 1) const;
+    ProblemBuffers::Problem DNA(const T &actions) const;
 
-  static Evaluator::Outcome parse_problem_and_evaluate( const ProblemBuffers::Problem & problem );
+    Outcome score(T &run_actions,
+                  const bool trace = false,
+                  const double carefulness = 1) const;
 
-  static Outcome score( T & run_actions,
-			const unsigned int prng_seed,
-			const std::vector<NetConfig> & configs,
-			const bool trace,
-			const unsigned int ticks_to_run );
+    static Evaluator::Outcome parse_problem_and_evaluate(const ProblemBuffers::Problem &problem);
+
+    static Outcome score(T &run_actions,
+                         const unsigned int prng_seed,
+                         const std::vector<NetConfig> &configs,
+                         const bool trace,
+                         const unsigned int ticks_to_run);
 };
 
 #endif

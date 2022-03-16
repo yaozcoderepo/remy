@@ -20,6 +20,7 @@ void print_range(const Range &range, const string &name)
 
 int main(int argc, char *argv[])
 {
+    // <Whisker> is Action
     WhiskerTree whiskers;
     string output_filename;
     BreederOptions options;
@@ -30,7 +31,7 @@ int main(int argc, char *argv[])
     for (int i = 1; i < argc; i++)
     {
         string arg(argv[i]);
-        if (arg.substr(0, 3) == "if=")
+        if (arg.substr(0, 3) == "if=") // input file name if=
         {
             string filename(arg.substr(3));
             int fd = open(filename.c_str(), O_RDONLY);
@@ -54,12 +55,13 @@ int main(int argc, char *argv[])
                 exit(1);
             }
         }
-        else if (arg.substr(0, 3) == "of=")
+        else if (arg.substr(0, 3) == "of=") // output file name of=
         {
             output_filename = string(arg.substr(3));
         }
-        else if (arg.substr(0, 4) == "opt=")
+        else if (arg.substr(0, 4) == "opt=") // optimization options
         {
+            // optimization options parsed from "opt=" are passed to `whisker_options`
             whisker_options.optimize_window_increment = false;
             whisker_options.optimize_window_multiple = false;
             whisker_options.optimize_intersend = false;
@@ -84,7 +86,7 @@ int main(int argc, char *argv[])
                 }
             }
         }
-        else if (arg.substr(0, 3) == "cf=")
+        else if (arg.substr(0, 3) == "cf=") // configuration file
         {
             config_filename = string(arg.substr(3));
             int cfd = open(config_filename.c_str(), O_RDONLY);
@@ -106,6 +108,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    // check if a configuration file is generated
     if (config_filename.empty())
     {
         fprintf(stderr, "An input configuration protobuf must be provided via the cf= option. \n");
@@ -113,12 +116,15 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    // supply configurations from "cf=" file to options <BreederOptions>
+    // Basically, options contains all design assumptions for a situation
     options.config_range = ConfigRange(input_config);
 
-    RatBreeder breeder(options, whisker_options);
+    RatBreeder breeder(options, whisker_options); // pass design assumptions and optimization options to breeder <RatBreeder>
 
-    unsigned int run = 0;
+    unsigned int run = 0; // epoch
 
+    // print out input configurations
     printf("#######################\n");
     printf("Evaluator simulations will run for %d ticks\n",
            options.config_range.simulation_ticks);
@@ -131,6 +137,8 @@ int main(int argc, char *argv[])
     print_range(options.config_range.mean_on_duration, "mean_on_duration");
     print_range(options.config_range.mean_off_duration, "mean_off_duration");
     print_range(options.config_range.stochastic_loss_rate, "stochastic_loss_rate");
+    // if the buffer size is not infinite, print the buffer size
+    // else print `Optimizing for infinitely sized buffers.`
     if (options.config_range.buffer_size.low != numeric_limits<unsigned int>::max())
     {
         print_range(options.config_range.buffer_size, "buffer_size");
@@ -140,9 +148,11 @@ int main(int argc, char *argv[])
         printf("Optimizing for infinitely sized buffers. \n");
     }
 
+    // print out whiskertree structure
     printf("Initial rules (use if=FILENAME to read from disk): %s\n", whiskers.str().c_str());
     printf("#######################\n");
 
+    // print out output file information
     if (!output_filename.empty())
     {
         printf("Writing to \"%s.N\".\n", output_filename.c_str());
@@ -152,6 +162,7 @@ int main(int argc, char *argv[])
         printf("Not saving output. Use the of=FILENAME argument to save the results.\n");
     }
 
+    // specify training configurations
     RemyBuffers::ConfigVector training_configs;
     bool written = false;
 

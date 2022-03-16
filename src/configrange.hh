@@ -52,14 +52,14 @@ public:
 class ConfigRange
 {
 public:
-    Range link_ppt;
-    Range rtt;
-    Range mean_on_duration;
-    Range mean_off_duration;
-    Range num_senders;
-    Range buffer_size;
-    unsigned int simulation_ticks;
-    Range stochastic_loss_rate;
+    Range link_ppt;                // link capacity (packets per tick)
+    Range rtt;                     // round-trip time
+    Range mean_on_duration;        // average of "on" duration
+    Range mean_off_duration;       // average of "off" duration
+    Range num_senders;             // multiplexity
+    Range buffer_size;             // size of buffer at routers
+    unsigned int simulation_ticks; // the number of ticks for the simulation
+    Range stochastic_loss_rate;    // package loss rate
 
     ConfigRange(void);
     ConfigRange(RemyBuffers::ConfigRange configrange);
