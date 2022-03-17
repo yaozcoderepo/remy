@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 
     while (1)
     {
-        auto outcome = breeder.improve(whiskers);
+        auto outcome = breeder.improve(whiskers); // greedy steps to build and improve rule table
         printf("run = %u, score = %f\n", run, outcome.score);
 
         printf("whiskers: %s\n", whiskers.str().c_str());
@@ -186,10 +186,14 @@ int main(int argc, char *argv[])
                 }
             }
             printf("===\nconfig: %s\n", run.first.str().c_str());
+            // ex: config: mean_on=5.000000, mean_off=5.000000, nsrc=3.000000, link_ppt=10.000000, delay=100.000000, buffer_size=10000.000000, stochastic_loss_rate = 0.100000
             for (auto &x : run.second)
             {
                 printf("sender: [tp=%f, del=%f]\n", x.first / run.first.link_ppt, x.second / run.first.delay);
             }
+            // sender: [tp=0.038204, del=1.001007]
+            // sender: [tp=0.040126, del=1.001032]
+            // sender: [tp=0.046403, del=1.001029]
         }
 
         if (!output_filename.empty())
