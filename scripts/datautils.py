@@ -1,5 +1,6 @@
-import sys
 import os
+import sys
+
 try:
     sys.path.append(os.path.join(os.path.dirname(__file__), "..", "protobufs"))
     import simulationresults_pb2
@@ -7,8 +8,10 @@ except ImportError as e:
     if "google.protobuf" in str(e):
         print("This script requires google.protobuf. Run: sudo apt-get install python-protobuf")
     else:
-        print("Run 'make' in the directory one level above this one before using this script.")
+        print(
+            "Run 'make' in the directory one level above this one before using this script.")
     exit(1)
+
 
 def read_data_file(logfilename):
     logfile = open(logfilename, 'rb')
@@ -16,6 +19,7 @@ def read_data_file(logfilename):
     data.ParseFromString(logfile.read())
     logfile.close()
     return data
+
 
 def contains_memory(memoryrange, memory):
     """Returns True if the given `memory` is in `memoryrange`, False if not."""
@@ -27,18 +31,21 @@ def contains_memory(memoryrange, memory):
             return False
     return True
 
+
 def find_action(tree, memory):
     """Returns the action in the action tree for the given memory."""
     while tree.children:
         for child in tree.children:
             if contains_memory(child.domain, memory):
                 tree = child
-                break # then continue in while loop
+                break  # then continue in while loop
         else:
-            raise RuntimeError("Couldn't find action for {!r}".format(point.memory))
+            raise RuntimeError(
+                "Couldn't find action for {!r}".format(point.memory))
     assert tree.HasField("leaf"), "Action tree has neither leaf nor children"
     assert contains_memory(tree.leaf.domain, memory)
     return tree.leaf
+
 
 class RunData(object):
     """Provides functions for extracting data from a SimulationRunData protobuf."""
@@ -145,7 +152,8 @@ class RunData(object):
         elif name in self.FUNCTION_ATTRIBUTES:
             return self.get_times(), self._get_function_data(sender, *self.FUNCTION_ATTRIBUTES[name])
         else:
-            raise ValueError("Unknown attribute for get_time_data(): " + repr(name))
+            raise ValueError(
+                "Unknown attribute for get_time_data(): " + repr(name))
 
     def _get_raw_data(self, sender, *attrnames):
         """Retrieves the attribute specified by the elements in `attrnames` from
@@ -170,7 +178,8 @@ class RunData(object):
         assert self.actions is not None, "RunData needs a actions object for this function"
         data = []
         for point in filter(self._in_range, self.pb.point):
-            action = find_action(self.actions, point.sender_data[sender].sender_state.memory)
+            action = find_action(
+                self.actions, point.sender_data[sender].sender_state.memory)
             value = getattr(action, attrname)
             data.append(value)
         return data
@@ -235,7 +244,8 @@ class RunData(object):
             y[i] = f(x1[i], x2[i], ...)
         where x1, x2, etc. are data retrieved using get_data(), and f is the
         function `fn`."""
-        data = zip(*(self.get_data(sender, attrname) for attrname in attrnames))
+        data = zip(*(self.get_data(sender, attrname)
+                   for attrname in attrnames))
         return [fn(*datum) for datum in data]
 
     def get_action_bounds(self, sender, attrname):
@@ -251,7 +261,8 @@ class RunData(object):
         upper = []
         last_action = None
         for point in filter(self._in_range, self.pb.point):
-            action = find_action(self.actions, point.sender_data[sender].sender_state.memory)
+            action = find_action(
+                self.actions, point.sender_data[sender].sender_state.memory)
             if action == last_action:
                 continue
             lower.append(getattr(action.domain.lower, attrname))
@@ -265,7 +276,8 @@ class RunData(object):
         times = []
         last_action = None
         for point in filter(self._in_range, self.pb.point):
-            action = find_action(self.actions, point.sender_data[sender].sender_state.memory)
+            action = find_action(
+                self.actions, point.sender_data[sender].sender_state.memory)
             if action != last_action:
                 times.append(point.seconds)
             last_action = action

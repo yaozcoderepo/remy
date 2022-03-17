@@ -2,25 +2,28 @@
 """Runs sender-runner enough times to generate a plot, and plots the result.
 This script requires Python 3."""
 
-import sys
-import os
-import shutil
 import argparse
-import subprocess
-import re
-import time
-import numpy as np
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import csv
 import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+from itertools import chain
 from math import log2
 from warnings import warn
-from itertools import chain
 
-from remy_tool_runner import SenderRunnerRunner
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+
 import utils
+from remy_tool_runner import SenderRunnerRunner
+
+matplotlib.use('Agg')
+
 
 use_color = True
 DEFAULT_RESULTS_DIR = "results"
@@ -46,9 +49,12 @@ class BaseRemyCCPerformancePlotGenerator:
         generators.
     """
 
-    SENDER_REGEX = re.compile("^sender: \[tp=(-?\d+(?:\.\d+)?), del=(-?\d+(?:\.\d+)?)\]$", re.MULTILINE)
-    NORM_SCORE_REGEX = re.compile("^normalized_score = (-?\d+(?:\.\d+)?)$", re.MULTILINE)
-    LINK_PPT_PRIOR_REGEX = re.compile("^link_packets_per_ms\s+\{\n\s+low: (-?\d+(?:\.\d+)?)\n\s+high: (-?\d+(?:\.\d+)?)$", re.MULTILINE)
+    SENDER_REGEX = re.compile(
+        "^sender: \[tp=(-?\d+(?:\.\d+)?), del=(-?\d+(?:\.\d+)?)\]$", re.MULTILINE)
+    NORM_SCORE_REGEX = re.compile(
+        "^normalized_score = (-?\d+(?:\.\d+)?)$", re.MULTILINE)
+    LINK_PPT_PRIOR_REGEX = re.compile(
+        "^link_packets_per_ms\s+\{\n\s+low: (-?\d+(?:\.\d+)?)\n\s+high: (-?\d+(?:\.\d+)?)$", re.MULTILINE)
 
     def __init__(self, link_ppt_range, **kwargs):
         self.link_ppt_range = link_ppt_range
@@ -60,7 +66,8 @@ class BaseRemyCCPerformancePlotGenerator:
             self._link_ppt_priors = []
 
         if len(kwargs) > 0:
-            raise TypeError("Unrecognized arguments: " + ", ".join(kwargs.keys()))
+            raise TypeError("Unrecognized arguments: " +
+                            ", ".join(kwargs.keys()))
 
     def get_statistics(self, remyccfilename, link_ppt):
         """Must be implemented by subclasses. Should, for the given RemyCC and
@@ -70,12 +77,13 @@ class BaseRemyCCPerformancePlotGenerator:
         `link_ppt_prior` is a 2-tuple `(low, high)` being the link speed range
         on which the RemyCC was trained.
         """
-        raise NotImplementedError("subclasses of BaseRemyCCPerformancePlotGenerator must implement get_statistics")
+        raise NotImplementedError(
+            "subclasses of BaseRemyCCPerformancePlotGenerator must implement get_statistics")
 
     def get_data_file(self, remyccfilename):
         if self.data_dir:
             data_filename = "data-{remycc}.csv".format(
-                    remycc=os.path.basename(remyccfilename))
+                remycc=os.path.basename(remyccfilename))
             data_file = open(os.path.join(self.data_dir, data_filename), "w")
             return data_file
         else:
@@ -91,13 +99,15 @@ class BaseRemyCCPerformancePlotGenerator:
 
         for i, link_ppt in enumerate(link_ppt_range, start=1):
             print("\033[KGenerating score for if={:s}, link={:f} ({:d} of {:d})...".format(
-                        remyccfilename, link_ppt, i, npoints),
-                        file=sys.stderr, end=self._progress_end_char, flush=True)
-            norm_score, sender_data, link_ppt_prior = self.get_statistics(remyccfilename, link_ppt)
+                remyccfilename, link_ppt, i, npoints),
+                file=sys.stderr, end=self._progress_end_char, flush=True)
+            norm_score, sender_data, link_ppt_prior = self.get_statistics(
+                remyccfilename, link_ppt)
             norm_scores.append(norm_score)
             sender_numbers = chain(*sender_data)
             if data_file:
-                data_csv.writerow([link_ppt, norm_score] + list(sender_numbers))
+                data_csv.writerow([link_ppt, norm_score] +
+                                  list(sender_numbers))
             self._update_link_ppt_prior(link_ppt_prior)
 
         if data_file:
@@ -105,8 +115,9 @@ class BaseRemyCCPerformancePlotGenerator:
 
         if self.axes:
             print("\033[KPlotting for file {}...".format(remyccfilename), file=sys.stderr,
-                    end=self._progress_end_char, flush=True)
-            link_speeds = [LINK_PPT_TO_MBPS_CONVERSION*l for l in link_ppt_range]
+                  end=self._progress_end_char, flush=True)
+            link_speeds = [LINK_PPT_TO_MBPS_CONVERSION *
+                           l for l in link_ppt_range]
             add_plot(self.axes, link_speeds, norm_scores, label=remyccfilename)
 
         print("\033[KDone file {}.".format(remyccfilename), file=sys.stderr)
@@ -124,11 +135,13 @@ class BaseRemyCCPerformancePlotGenerator:
         norm_matches = cls.NORM_SCORE_REGEX.findall(result)
         if len(norm_matches) != 1:
             print(result)
-            raise RuntimeError("Found no or duplicate normalized scores in this output.")
+            raise RuntimeError(
+                "Found no or duplicate normalized scores in this output.")
         norm_score = float(norm_matches[0])
 
         sender_matches = cls.SENDER_REGEX.findall(result)
-        sender_data = [map(float, x) for x in sender_matches] # [[throughput, delay], [throughput, delay], ...]
+        # [[throughput, delay], [throughput, delay], ...]
+        sender_data = [map(float, x) for x in sender_matches]
         if len(sender_data) == 0:
             print(result)
             warn("No senders found in this output.")
@@ -136,7 +149,8 @@ class BaseRemyCCPerformancePlotGenerator:
         link_ppt_prior_matches = cls.LINK_PPT_PRIOR_REGEX.findall(result)
         if len(link_ppt_prior_matches) != 1:
             print(result)
-            raise RuntimeError("Found no or duplicate link packets per ms prior assumptions in this output.")
+            raise RuntimeError(
+                "Found no or duplicate link packets per ms prior assumptions in this output.")
         link_ppt_prior = tuple(map(float, link_ppt_prior_matches[0]))
 
         # Divide norm_score the number of senders (sender-runner returns the sum)
@@ -166,7 +180,7 @@ class SenderRunnerFilesMixin:
             return None
 
         filename = "senderrunner-{remycc}-{link_ppt:f}.out".format(
-                remycc=os.path.basename(remyccfilename), link_ppt=link_ppt)
+            remycc=os.path.basename(remyccfilename), link_ppt=link_ppt)
         filename = os.path.join(self.console_dir, filename)
         return filename
 
@@ -186,14 +200,16 @@ class SenderRunnerRemyCCPerformancePlotGenerator(SenderRunnerFilesMixin, BaseRem
             parameters["command"] = senderrunnercmd
         self.senderrunner = SenderRunnerRunner(**parameters)
         self.console_dir = kwargs.pop("console_dir", None)
-        super(SenderRunnerRemyCCPerformancePlotGenerator, self).__init__(link_ppt_range, **kwargs)
+        super(SenderRunnerRemyCCPerformancePlotGenerator,
+              self).__init__(link_ppt_range, **kwargs)
 
     def get_statistics(self, remyccfilename, link_ppt):
         """Runs sender-runner on the given RemyCC `remyccfilename` and with the given
         parameters, and returns the normalized score and sender throughputs and delays.
         """
         outfile = self.get_console_filename(remyccfilename, link_ppt)
-        output = self.senderrunner.run(remyccfilename, {'link_ppt': link_ppt}, outfile=outfile)
+        output = self.senderrunner.run(
+            remyccfilename, {'link_ppt': link_ppt}, outfile=outfile)
         return self.parse_senderrunner_output(output)
 
 
@@ -208,7 +224,8 @@ class OutputsDirectoryRemyCCPerformancePlotGenerator(SenderRunnerFilesMixin, Bas
 
     def __init__(self, link_ppt_range, console_dir, **kwargs):
         self.console_dir = console_dir
-        super(OutputsDirectoryRemyCCPerformancePlotGenerator, self).__init__(link_ppt_range, **kwargs)
+        super(OutputsDirectoryRemyCCPerformancePlotGenerator,
+              self).__init__(link_ppt_range, **kwargs)
 
     def get_statistics(self, remyccfilename, link_ppt):
         filename = self.get_console_filename(remyccfilename, link_ppt)
@@ -223,6 +240,7 @@ def add_plot(axes, link_speeds, norm_scores, **kwargs):
     scores `norm_scores` to the `axes`."""
     return plt.semilogx(link_speeds, norm_scores, axes=axes, **kwargs)
 
+
 def process_replot_argument(replot_dir, results_dir):
     """Reads the args.json file in a results directory, copies it to an
     appropriate location in the current results directory and returns the link
@@ -233,15 +251,18 @@ def process_replot_argument(replot_dir, results_dir):
     argsfile.close()
     args = jsondict["args"]
     remyccs = args["remycc"]
-    link_ppt_range = np.logspace(np.log10(args["link_ppt"][0]), np.log10(args["link_ppt"][1]), args["num_points"])
+    link_ppt_range = np.logspace(np.log10(args["link_ppt"][0]), np.log10(
+        args["link_ppt"][1]), args["num_points"])
     console_dir = os.path.join(replot_dir, "outputs")
 
-    replots_dirname = os.path.join(results_dir, "replots", os.path.basename(replot_dir))
+    replots_dirname = os.path.join(
+        results_dir, "replots", os.path.basename(replot_dir))
     os.makedirs(replots_dirname, exist_ok=True)
     target_filename = os.path.join(replots_dirname, "args.json")
     shutil.copy(argsfilename, target_filename)
 
     return remyccs, link_ppt_range, console_dir
+
 
 def plot_from_original_file(datafilename, axes):
     """Plots data from the file `datafile` to the axes `axes`."""
@@ -250,16 +271,19 @@ def plot_from_original_file(datafilename, axes):
     try:
         datafile = open(datafilename)
         for line in datafile:
-            row = line.split() # at whitespace, treat consecutive spaces as one
+            row = line.split()  # at whitespace, treat consecutive spaces as one
             row = [float(x) for x in row]
             link_speeds.append(row[0])
             norm_score = log2(row[1]/row[0]) - log2(row[2]/150)
-            norm_score -= log2(0.75) # reverse the reversal of the equal-share normalization
+            # reverse the reversal of the equal-share normalization
+            norm_score -= log2(0.75)
             norm_scores.append(norm_score)
         datafile.close()
         add_plot(axes, link_speeds, norm_scores, label=datafilename)
     except (IOError, ValueError) as e:
-        print("Error plotting from {}: {}".format(datafilename, e), file=sys.stderr)
+        print("Error plotting from {}: {}".format(
+            datafilename, e), file=sys.stderr)
+
 
 def generate_remyccs_list(specs):
     """Returns a list of RemyCC files, for example:
@@ -280,8 +304,10 @@ def generate_remyccs_list(specs):
             else:
                 stop = int(match.group(4))
                 step = int(match.group(3))
-            result.extend("{name}.{index:d}".format(name=name, index=index) for index in range(start, stop+1, step))
+            result.extend("{name}.{index:d}".format(name=name, index=index)
+                          for index in range(start, stop+1, step))
     return result
+
 
 def make_results_dir(dirname):
     return utils.make_output_dir(dirname, DEFAULT_RESULTS_DIR, "results" + time.strftime("%Y%m%d-%H%M%S"), LAST_RESULTS_SYMLINK)
@@ -291,36 +317,36 @@ def make_results_dir(dirname):
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("remycc", nargs="*", type=str,
-    help="RemyCC file(s) to run, can also use e.g. name.[5:5:30] to do name.5, name.10, ..., name.30")
+                    help="RemyCC file(s) to run, can also use e.g. name.[5:5:30] to do name.5, name.10, ..., name.30")
 parser.add_argument("--sender", type=str, default="",
-    help="Indicate that we are running poisson senders. ")
+                    help="Indicate that we are running poisson senders. ")
 parser.add_argument("-R", "--replot", type=str, action="append", default=[],
-    help="Replot results in this directory from output files (can be specified multiple times)")
+                    help="Replot results in this directory from output files (can be specified multiple times)")
 parser.add_argument("-n", "--num-points", type=int, default=1000,
-    help="Number of points to plot")
+                    help="Number of points to plot")
 parser.add_argument("-l", "--link-ppt", type=float, default=[0.1, 100.0], nargs=2, metavar="PPMS",
-    help="Link packets per millisecond, range to test, first argument is low, second is high")
+                    help="Link packets per millisecond, range to test, first argument is low, second is high")
 parser.add_argument("-O", "--results-dir", type=str, default=None,
-    help="Directory to place output files in.")
+                    help="Directory to place output files in.")
 parser.add_argument("--no-console-output-files", action="store_false", default=True, dest="console_output_files",
-    help="Don't generate console output files")
+                    help="Don't generate console output files")
 parser.add_argument("--originals", type=str, default="originals",
-    help="Directory in which to look for original data files to add to plot.")
+                    help="Directory in which to look for original data files to add to plot.")
 parser.add_argument("--sender-runner", type=str, default=None,
-    help="sender-runner executable location, defaults to ../src/sender-runner")
+                    help="sender-runner executable location, defaults to ../src/sender-runner")
 parser.add_argument("--newlines", action="store_const", dest="progress_end_char", const='\n', default='\r',
-    help="Print newlines (\\n) instead of carriage returns (\\r) when reporting progress")
+                    help="Print newlines (\\n) instead of carriage returns (\\r) when reporting progress")
 senderrunner_group = parser.add_argument_group("sender-runner arguments")
 senderrunner_group.add_argument("-s", "--nsenders", type=int, default=2,
-    help="Number of senders")
+                                help="Number of senders")
 senderrunner_group.add_argument("-d", "--delay", type=float, default=150.0,
-    help="Delay (milliseconds)")
+                                help="Delay (milliseconds)")
 senderrunner_group.add_argument("-q", "--mean-on", type=float, default=1000.0,
-    help="Mean on duration (milliseconds)")
+                                help="Mean on duration (milliseconds)")
 senderrunner_group.add_argument("-w", "--mean-off", type=float, default=1000.0,
-    help="Mean off duration (milliseconds)")
+                                help="Mean off duration (milliseconds)")
 senderrunner_group.add_argument("-b", "--buffer-size", type=str, default="inf",
-    help="Buffer size, a number or 'inf' for infinite buffers")
+                                help="Buffer size, a number or 'inf' for infinite buffers")
 args = parser.parse_args()
 
 # Sanity-check arguments, warn user say they can stop things early
@@ -346,8 +372,10 @@ os.makedirs(plots_dirname, exist_ok=True)
 utils.log_arguments(results_dirname, args)
 
 # Generate parameters
-link_ppt_range = np.logspace(np.log10(args.link_ppt[0]), np.log10(args.link_ppt[1]), args.num_points)
-parameter_keys = ["sender", "nsenders", "delay", "mean_on", "mean_off", "buffer_size"]
+link_ppt_range = np.logspace(
+    np.log10(args.link_ppt[0]), np.log10(args.link_ppt[1]), args.num_points)
+parameter_keys = ["sender", "nsenders", "delay",
+                  "mean_on", "mean_off", "buffer_size"]
 parameters = {key: getattr(args, key) for key in parameter_keys}
 remyccfiles = generate_remyccs_list(args.remycc)
 
@@ -355,18 +383,19 @@ ax = plt.axes()
 
 # Generate data and plots (the main part)
 generator = SenderRunnerRemyCCPerformancePlotGenerator(link_ppt_range, parameters,
-        console_dir=console_dirname, data_dir=data_dirname, axes=ax, senderrunnercmd=args.sender_runner,
-        progress_end_char=args.progress_end_char)
+                                                       console_dir=console_dirname, data_dir=data_dirname, axes=ax, senderrunnercmd=args.sender_runner,
+                                                       progress_end_char=args.progress_end_char)
 for remyccfile in remyccfiles:
     generator.generate(remyccfile)
 link_ppt_priors = generator.get_link_ppt_priors()
 
 # Generate replots
 for replot_dir in args.replot:
-    remyccs, link_ppt_range, outputs_dir = process_replot_argument(replot_dir, results_dirname)
+    remyccs, link_ppt_range, outputs_dir = process_replot_argument(
+        replot_dir, results_dirname)
     generator = OutputsDirectoryRemyCCPerformancePlotGenerator(link_ppt_range, outputs_dir,
-            link_ppt_priors=link_ppt_priors, data_dir=data_dirname, axes=ax,
-            progress_end_char=args.progress_end_char)
+                                                               link_ppt_priors=link_ppt_priors, data_dir=data_dirname, axes=ax,
+                                                               progress_end_char=args.progress_end_char)
     for remycc in remyccs:
         generator.generate(remycc)
     link_ppt_priors = generator.get_link_ppt_priors()
@@ -384,7 +413,7 @@ if os.path.isdir(args.originals):
 if len(link_ppt_priors) == 1:
     link_ppt_low, link_ppt_high = link_ppt_priors[0]
     plt.axvspan(LINK_PPT_TO_MBPS_CONVERSION*link_ppt_low, LINK_PPT_TO_MBPS_CONVERSION*link_ppt_high,
-            linewidth=0.0, facecolor="0.2", alpha=0.2)
+                linewidth=0.0, facecolor="0.2", alpha=0.2)
 elif len(link_ppt_priors) > 1:
     print("Multiple link_ppt_priors found, not highlighting on plot.")
 
@@ -393,5 +422,7 @@ plot_filename = "link_ppt"
 ax.set_xlabel("link speed (Mbps)")
 ax.set_ylabel("normalized score")
 ax.legend(loc='lower center', bbox_to_anchor=(0.5, 1))
-plt.savefig(os.path.join(plots_dirname, "{:s}.png".format(plot_filename)), format="png", bbox_inches="tight")
-plt.savefig(os.path.join(plots_dirname, "{:s}.pdf".format(plot_filename)), format="pdf", bbox_inches="tight")
+plt.savefig(os.path.join(plots_dirname, "{:s}.png".format(
+    plot_filename)), format="png", bbox_inches="tight")
+plt.savefig(os.path.join(plots_dirname, "{:s}.pdf".format(
+    plot_filename)), format="pdf", bbox_inches="tight")

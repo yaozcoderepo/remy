@@ -1,10 +1,11 @@
 # This file needs to be compatible with both Python 2 and Python 3.
 
+import json
 import os
+import subprocess
 import time
 from socket import gethostname
-import subprocess
-import json
+
 
 def log_arguments(argsfile, args):
     if os.path.isdir(argsfile):
@@ -20,13 +21,15 @@ def log_arguments(argsfile, args):
         "git": {},
     }
     try:
-        jsondict["git"]["describe"] = subprocess.check_output(['git', 'describe', '--always', '--dirty']).decode().strip()
+        jsondict["git"]["describe"] = subprocess.check_output(
+            ['git', 'describe', '--always', '--dirty']).decode().strip()
     except subprocess.CalledProcessError:
         pass
     json.dump(jsondict, argsfile, indent=2, sort_keys=True)
 
     if dir_given:
         argsfile.close()
+
 
 def make_output_dir(dirname, default_parent, default_child, symlink):
     if dirname is None:
