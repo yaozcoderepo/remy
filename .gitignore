@@ -5,6 +5,7 @@ Makefile
 Makefile.in
 *.log
 *.trs
+.DS_Store
 
 /INSTALL
 /aclocal.m4

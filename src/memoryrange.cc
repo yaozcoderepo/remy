@@ -137,7 +137,8 @@ MemoryRange::MemoryRange(const RemyBuffers::MemoryRange &dna)
         _active_axis = vector<Axis>({RemyBuffers::MemoryRange::SEND_EWMA,
                                      RemyBuffers::MemoryRange::REC_EWMA,
                                      RemyBuffers::MemoryRange::RTT_RATIO,
-                                     RemyBuffers::MemoryRange::SLOW_REC_EWMA});
+                                     RemyBuffers::MemoryRange::SLOW_REC_EWMA,
+                                     RemyBuffers::MemoryRange::MIN_RTT});
     }
 }
 

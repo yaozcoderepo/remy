@@ -55,16 +55,25 @@ public:
 
     static const unsigned int datasize = 6;
 
-    const DataType &field(unsigned int num) const { return num == 0 ? _rec_send_ewma : num == 1 ? _rec_rec_ewma
-                                                                                   : num == 2   ? _rtt_ratio
-                                                                                   : num == 3   ? _slow_rec_rec_ewma
-                                                                                   : num == 4   ? _rtt_diff
-                                                                                                : _queueing_delay; }
-    DataType &mutable_field(unsigned int num) { return num == 0 ? _rec_send_ewma : num == 1 ? _rec_rec_ewma
-                                                                               : num == 2   ? _rtt_ratio
-                                                                               : num == 3   ? _slow_rec_rec_ewma
-                                                                               : num == 4   ? _rtt_diff
-                                                                                            : _queueing_delay; }
+    const DataType &field(unsigned int num) const
+    {
+        return num == 0 ? _rec_send_ewma : num == 1 ? _rec_rec_ewma
+                                       : num == 2   ? _rtt_ratio
+                                       : num == 3   ? _slow_rec_rec_ewma
+                                       : num == 4   ? _rtt_diff
+                                       : num == 5   ? _queueing_delay
+                                                    : _min_rtt;
+    }
+
+    DataType &mutable_field(unsigned int num)
+    {
+        return num == 0 ? _rec_send_ewma : num == 1 ? _rec_rec_ewma
+                                       : num == 2   ? _rtt_ratio
+                                       : num == 3   ? _slow_rec_rec_ewma
+                                       : num == 4   ? _rtt_diff
+                                       : num == 5   ? _queueing_delay
+                                                    : _min_rtt;
+    }
 
     void packet_sent(const Packet &packet __attribute((unused))) {}
     void packets_received(const std::vector<Packet> &packets, const unsigned int flow_id, const int largest_ack);

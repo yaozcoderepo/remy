@@ -64,6 +64,7 @@ class RunData(object):
         "rec_send_ewma": ("sender_state", "memory", "rec_send_ewma"),
         "rec_rec_ewma": ("sender_state", "memory", "rec_rec_ewma"),
         "rtt_ratio": ("sender_state", "memory", "rtt_ratio"),
+        "min_rtt": ("sender_state", "memory", "min_rtt"),
         "slow_rec_rec_ewma": ("sender_state", "memory", "slow_rec_rec_ewma"),
         "queueing_delay": ("sender_state", "memory", "queueing_delay"),
         "rtt_diff": ("sender_state", "memory", "rtt_diff"),
