@@ -91,7 +91,7 @@ string Memory::str(unsigned int num) const
 
 const Memory &MAX_MEMORY(void)
 {
-    static const Memory max_memory({163840, 163840, 163840, 163840, 163840, 163840});
+    static const Memory max_memory({163840, 163840, 163840, 163840, 163840, 163840, 163840});
     return max_memory;
 }
 

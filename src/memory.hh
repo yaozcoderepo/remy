@@ -34,7 +34,7 @@ public:
           _queueing_delay(s_data.at(5)),
           _last_tick_sent(0),
           _last_tick_received(0),
-          _min_rtt(0)
+          _min_rtt(s_data.at(6))
     {
     }
 
