@@ -36,3 +36,5 @@ Makefile.in
 /src/remy-poisson
 /graph/ratatouille
 /src/scoring-example
+
+outputs/
