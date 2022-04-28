@@ -47,7 +47,6 @@ void Memory::packets_received(const vector<Packet> &packets, const unsigned int 
             _rtt_diff = rtt - _min_rtt;
             assert(_rtt_diff >= 0);
             _queueing_delay = _rec_rec_ewma * pkt_outstanding;
-            _rtt_ewma = (1 - alpha) * _rtt_ewma + alpha * rtt;
         }
     }
 }
@@ -55,8 +54,8 @@ void Memory::packets_received(const vector<Packet> &packets, const unsigned int 
 string Memory::str(void) const
 {
     char tmp[256];
-    snprintf(tmp, 256, "sewma=%f, rewma=%f, rttr=%f, slowrewma=%f, rttd=%f, qdelay=%f, rtte=%f",
-             _rec_send_ewma, _rec_rec_ewma, _rtt_ratio, _slow_rec_rec_ewma, _rtt_diff, _queueing_delay, _rtt_ewma);
+    snprintf(tmp, 256, "sewma=%f, rewma=%f, rttr=%f, slowrewma=%f, rttd=%f, qdelay=%f, min_rtt=%f",
+             _rec_send_ewma, _rec_rec_ewma, _rtt_ratio, _slow_rec_rec_ewma, _rtt_diff, _queueing_delay, _min_rtt);
     return tmp;
 }
 
@@ -84,7 +83,7 @@ string Memory::str(unsigned int num) const
         snprintf(tmp, 50, "qdelay=%f ", _queueing_delay);
         break;
     case 6:
-        snprintf(tmp, 50, "rtte=%f", _rtt_ewma);
+        snprintf(tmp, 50, "min_rtt=%f", _min_rtt);
         break;
     }
     return tmp;
@@ -105,7 +104,7 @@ RemyBuffers::Memory Memory::DNA(void) const
     ret.set_slow_rec_rec_ewma(_slow_rec_rec_ewma);
     ret.set_rtt_diff(_rtt_diff);
     ret.set_queueing_delay(_queueing_delay);
-    ret.set_rtt_ewma(_rtt_ewma);
+    ret.set_min_rtt(_min_rtt);
     return ret;
 }
 
@@ -121,7 +120,6 @@ Memory::Memory(const bool is_lower_limit, const RemyBuffers::Memory &dna)
       _slow_rec_rec_ewma(get_val_or_default(dna, slow_rec_rec_ewma, is_lower_limit)),
       _rtt_diff(get_val_or_default(dna, rtt_diff, is_lower_limit)),
       _queueing_delay(get_val_or_default(dna, queueing_delay, is_lower_limit)),
-      _rtt_ewma(get_val_or_default(dna, rtt_ewma, is_lower_limit)),
       _last_tick_sent(0),
       _last_tick_received(0),
       _min_rtt(0)
@@ -137,7 +135,7 @@ size_t hash_value(const Memory &mem)
     boost::hash_combine(seed, mem._slow_rec_rec_ewma);
     boost::hash_combine(seed, mem._rtt_diff);
     boost::hash_combine(seed, mem._queueing_delay);
-    boost::hash_combine(seed, mem._rtt_ewma);
+    boost::hash_combine(seed, mem._min_rtt);
 
     return seed;
 }

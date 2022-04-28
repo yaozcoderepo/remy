@@ -138,7 +138,7 @@ MemoryRange::MemoryRange(const RemyBuffers::MemoryRange &dna)
                                      RemyBuffers::MemoryRange::REC_EWMA,
                                      RemyBuffers::MemoryRange::RTT_RATIO,
                                      RemyBuffers::MemoryRange::SLOW_REC_EWMA,
-                                     RemyBuffers::MemoryRange::RTT_EWMA});
+                                     RemyBuffers::MemoryRange::MIN_RTT});
     }
 }
 
