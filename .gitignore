@@ -39,3 +39,5 @@ Makefile.in
 
 outputs/
 tests/
+testing.cfg 
+remycc*

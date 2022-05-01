@@ -40,6 +40,7 @@ message MemoryRange {
     RTT_DIFF = 4;
     QUEUEING_DELAY = 5;
     RTT_EWMA = 6;
+    SLOW_RTT_EWMA = 7;
   }
 
   repeated Axis active_axis = 13;
@@ -53,6 +54,7 @@ message Memory {
   optional double rtt_diff = 25;
   optional double queueing_delay = 26;
   optional double rtt_ewma = 27;
+  optional double slow_rtt_ewma = 28;
 }
 
 message Whisker {

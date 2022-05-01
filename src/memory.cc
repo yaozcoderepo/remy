@@ -48,6 +48,7 @@ void Memory::packets_received(const vector<Packet> &packets, const unsigned int 
             assert(_rtt_diff >= 0);
             _queueing_delay = _rec_rec_ewma * pkt_outstanding;
             _rtt_ewma = (1 - alpha) * _rtt_ewma + alpha * rtt;
+            _slow_rtt_ewma = (1 - slow_alpha) * _slow_rtt_ewma + slow_alpha * rtt;
         }
     }
 }
@@ -55,8 +56,8 @@ void Memory::packets_received(const vector<Packet> &packets, const unsigned int 
 string Memory::str(void) const
 {
     char tmp[256];
-    snprintf(tmp, 256, "sewma=%f, rewma=%f, rttr=%f, slowrewma=%f, rttd=%f, qdelay=%f, rtte=%f",
-             _rec_send_ewma, _rec_rec_ewma, _rtt_ratio, _slow_rec_rec_ewma, _rtt_diff, _queueing_delay, _rtt_ewma);
+    snprintf(tmp, 256, "sewma=%f, rewma=%f, rttr=%f, slowrewma=%f, rttd=%f, qdelay=%f, rtte=%f, slowrtte=%f",
+             _rec_send_ewma, _rec_rec_ewma, _rtt_ratio, _slow_rec_rec_ewma, _rtt_diff, _queueing_delay, _rtt_ewma, _slow_rtt_ewma);
     return tmp;
 }
 
@@ -86,13 +87,16 @@ string Memory::str(unsigned int num) const
     case 6:
         snprintf(tmp, 50, "rtte=%f", _rtt_ewma);
         break;
+    case 7:
+        snprintf(tmp, 50, "slowrtte=%f", _slow_rtt_ewma);
+        break;
     }
     return tmp;
 }
 
 const Memory &MAX_MEMORY(void)
 {
-    static const Memory max_memory({163840, 163840, 163840, 163840, 163840, 163840, 163840});
+    static const Memory max_memory({163840, 163840, 163840, 163840, 163840, 163840, 163840, 163840});
     return max_memory;
 }
 
@@ -106,6 +110,7 @@ RemyBuffers::Memory Memory::DNA(void) const
     ret.set_rtt_diff(_rtt_diff);
     ret.set_queueing_delay(_queueing_delay);
     ret.set_rtt_ewma(_rtt_ewma);
+    ret.set_slow_rtt_ewma(_slow_rtt_ewma);
     return ret;
 }
 
@@ -122,6 +127,7 @@ Memory::Memory(const bool is_lower_limit, const RemyBuffers::Memory &dna)
       _rtt_diff(get_val_or_default(dna, rtt_diff, is_lower_limit)),
       _queueing_delay(get_val_or_default(dna, queueing_delay, is_lower_limit)),
       _rtt_ewma(get_val_or_default(dna, rtt_ewma, is_lower_limit)),
+      _slow_rtt_ewma(get_val_or_default(dna, slow_rtt_ewma, is_lower_limit)),
       _last_tick_sent(0),
       _last_tick_received(0),
       _min_rtt(0)
@@ -138,6 +144,7 @@ size_t hash_value(const Memory &mem)
     boost::hash_combine(seed, mem._rtt_diff);
     boost::hash_combine(seed, mem._queueing_delay);
     boost::hash_combine(seed, mem._rtt_ewma);
+    boost::hash_combine(seed, mem._slow_rtt_ewma);
 
     return seed;
 }

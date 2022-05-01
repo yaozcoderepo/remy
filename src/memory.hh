@@ -20,6 +20,7 @@ private:
     DataType _rtt_diff;
     DataType _queueing_delay;
     DataType _rtt_ewma;
+    DataType _slow_rtt_ewma;
 
     double _last_tick_sent;
     double _last_tick_received;
@@ -34,6 +35,7 @@ public:
           _rtt_diff(s_data.at(4)),
           _queueing_delay(s_data.at(5)),
           _rtt_ewma(s_data.at(6)),
+          _slow_rtt_ewma(s_data.at(7)),
           _last_tick_sent(0),
           _last_tick_received(0),
           _min_rtt(0)
@@ -48,15 +50,16 @@ public:
           _rtt_diff(0),
           _queueing_delay(0),
           _rtt_ewma(0),
+          _slow_rtt_ewma(0),
           _last_tick_sent(0),
           _last_tick_received(0),
           _min_rtt(0)
     {
     }
 
-    void reset(void) { _rec_send_ewma = _rec_rec_ewma = _rtt_ratio = _slow_rec_rec_ewma = _rtt_diff = _queueing_delay = _rtt_ewma = _last_tick_sent = _last_tick_received = _min_rtt = 0; }
+    void reset(void) { _rec_send_ewma = _rec_rec_ewma = _rtt_ratio = _slow_rec_rec_ewma = _rtt_diff = _queueing_delay = _rtt_ewma = _slow_rtt_ewma = _last_tick_sent = _last_tick_received = _min_rtt = 0; }
 
-    static const unsigned int datasize = 7;
+    static const unsigned int datasize = 8;
 
     const DataType &field(unsigned int num) const
     {
@@ -65,7 +68,8 @@ public:
                                        : num == 3   ? _slow_rec_rec_ewma
                                        : num == 4   ? _rtt_diff
                                        : num == 5   ? _queueing_delay
-                                                    : _rtt_ewma;
+                                       : num == 6   ? _rtt_ewma
+                                                    : _slow_rtt_ewma;
     }
 
     DataType &mutable_field(unsigned int num)
@@ -75,7 +79,8 @@ public:
                                        : num == 3   ? _slow_rec_rec_ewma
                                        : num == 4   ? _rtt_diff
                                        : num == 5   ? _queueing_delay
-                                                    : _rtt_ewma;
+                                       : num == 6   ? _rtt_ewma
+                                                    : _slow_rtt_ewma;
     }
 
     void packet_sent(const Packet &packet __attribute((unused))) {}
