@@ -22,7 +22,7 @@ public:
 
     Whisker(const MemoryRange &s_domain) : Whisker(get_optimizer().window_increment.default_value,
                                                    get_optimizer().window_multiple.default_value,
-                                                   get_optimizer().widnow_exponent.default_value,
+                                                   get_optimizer().window_exponent.default_value,
                                                    get_optimizer().intersend.default_value,
                                                    s_domain){};
     virtual ~Whisker(){};
@@ -66,10 +66,10 @@ public:
     static const OptimizationSettings &get_optimizer(void)
     {
         static OptimizationSettings default_settings{
-            {0, 256, 1, 32, 4, 1},          /* window increment */
-            {0, 1, 0.01, 0.5, 4, 1},        /* window multiple */
-            {1, 1.1, 1.15, 1.2, 1.25, 1.3}, /* window exponent */
-            {0.25, 3, 0.05, 1, 4, 3}        /* intersend */
+            {0, 256, 1, 32, 4, 1},       /* window increment */
+            {0, 1, 0.01, 0.5, 4, 1},     /* window multiple */
+            {0.5, 1.5, 0.05, 0.5, 4, 1}, /* window exponent */
+            {0.25, 3, 0.05, 1, 4, 3}     /* intersend */
         };
         return default_settings;
     }

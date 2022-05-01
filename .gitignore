@@ -35,3 +35,8 @@ Makefile.in
 /src/remy-poisson
 /graph/ratatouille
 /src/scoring-example
+
+outputs/
+tests/
+remycc*
+testing.cfg

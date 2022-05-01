@@ -56,11 +56,12 @@ vector<Whisker> Whisker::next_generation(bool optimize_window_increment, bool op
     auto window_exponent_alternatives = get_optimizer().window_exponent.alternatives(_window_exponent, optimize_window_exponent);
     auto intersend_alternatives = get_optimizer().intersend.alternatives(_intersend, optimize_intersend);
 
-    printf("Alternatives: window increment %u to %u, window multiple %f to %f, intersend %f to %f\n",
+    printf("Alternatives: window increment %u to %u, window multiple %f to %f, window exponent %f to %f, intersend %f to %f\n",
            *(min_element(window_increment_alternatives.begin(), window_increment_alternatives.end())),
            *(max_element(window_increment_alternatives.begin(), window_increment_alternatives.end())),
            *(min_element(window_multiple_alternatives.begin(), window_multiple_alternatives.end())),
            *(max_element(window_multiple_alternatives.begin(), window_multiple_alternatives.end())),
+           *(max_element(window_exponent_alternatives.begin(), window_exponent_alternatives.end())),
            *(max_element(window_exponent_alternatives.begin(), window_exponent_alternatives.end())),
            *(min_element(intersend_alternatives.begin(), intersend_alternatives.end())),
            *(max_element(intersend_alternatives.begin(), intersend_alternatives.end())));

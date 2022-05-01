@@ -82,5 +82,6 @@ vector<Whisker> WhiskerImprover::get_replacements(Whisker &whisker_to_improve)
 {
     return whisker_to_improve.next_generation(_options.optimize_window_increment,
                                               _options.optimize_window_multiple,
+                                              _options.optimize_window_exponent,
                                               _options.optimize_intersend);
 }
