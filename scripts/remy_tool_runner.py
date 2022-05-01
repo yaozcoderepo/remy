@@ -5,7 +5,6 @@ from warnings import warn
 ROOTDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HLINE2 = "=" * 80 + "\n"
 
-
 class BaseRemyToolRunner(object):
     """Manages the running of Remy tool."""
 
@@ -68,7 +67,7 @@ class BaseRemyToolRunner(object):
         parameters = self._get_parameters(parameters)
         command = [self.command, "if={:s}".format(remyccfilename)]
         command += ["{}={}".format(rroptname, parameters[paramname]) for rroptname, paramname in
-                    self.program_parameters if paramname in parameters]
+                self.program_parameters if paramname in parameters]
         output = subprocess.check_output(command, stderr=subprocess.STDOUT)
         output = output.decode()
         self._write_to_file(command, output, outfile)
@@ -88,7 +87,7 @@ class SenderRunnerRunner(BaseRemyToolRunner):
     }
 
     program_parameters = [
-        #   (sender-runner option name, Python option name)
+    #   (sender-runner option name, Python option name)
         ("sender", "sender"),
         ("nsrc", "nsenders"),
         ("link", "link_ppt"),
@@ -100,7 +99,6 @@ class SenderRunnerRunner(BaseRemyToolRunner):
     ]
 
     COMMAND = os.path.join(ROOTDIR, "src", "sender-runner")
-
 
 class SenderLoggerRunner(BaseRemyToolRunner):
 
@@ -114,7 +112,7 @@ class SenderLoggerRunner(BaseRemyToolRunner):
     }
 
     program_parameters = [
-        #   (sender-runner option name, Python option name)
+    #   (sender-runner option name, Python option name)
         ("sender", "sender"),
         ("nsrc", "nsenders"),
         ("link", "link_ppt"),
