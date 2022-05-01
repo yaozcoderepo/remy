@@ -9,5 +9,3 @@
                 min_sloss=0.1 max_sloss=0.2 sloss_incr=0.1 \
                 ticks=20 \
                 min_buf_size=10000 max_buf_size=10000 buf_size_incr=0
-
-
