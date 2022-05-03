@@ -11,6 +11,12 @@
 #include "configrange.hh"
 using namespace std;
 
+static const double delta = 1.0;
+
+static const double delay_delta = 2.0;
+
+static const double throughput_delta = 0.5;
+
 int main(int argc, char *argv[])
 {
     WhiskerTree whiskers;
@@ -191,7 +197,8 @@ int main(int argc, char *argv[])
 
     Evaluator<WhiskerTree>::Outcome parsed_outcome(proto_outcome);
     printf("score = %f\n", outcome.score);
-    double norm_score = 0;
+    // double norm_score = 0;
+    double delay_norm_score = 0;
 
     for (auto &run : parsed_outcome.throughputs_delays)
     {
@@ -199,11 +206,13 @@ int main(int argc, char *argv[])
         for (auto &x : run.second)
         {
             printf("sender: [tp=%f, del=%f]\n", x.first / run.first.link_ppt, x.second / run.first.delay);
-            norm_score += log2(x.first / run.first.link_ppt) - log2(x.second / run.first.delay);
+            // norm_score += log2(x.first / run.first.link_ppt) - log2(x.second / run.first.delay);
+            delay_norm_score += log2(x.first / run.first.link_ppt) - throughput_delta*log2(x.second / run.first.delay);
         }
     }
 
-    printf("normalized_score = %f\n", norm_score);
+    // printf("normalized_score = %f\n", norm_score);
+    printf("normalized_score_delta2 = %f\n", delay_norm_score);
 
     printf("Whiskers: %s\n", outcome.used_actions.str().c_str());
 
