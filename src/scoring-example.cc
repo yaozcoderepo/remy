@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
     Evaluator<WhiskerTree>::Outcome parsed_outcome(proto_outcome);
     printf("score = %f\n", outcome.score);
     // double norm_score = 0;
-    double delay_norm_score = 0;
+    double new_score = 0;
     // double throughput_norm_score = 0;
 
     for (auto &run : parsed_outcome.throughputs_delays)
