@@ -17,7 +17,7 @@ static const double delay_delta = 2.0;
 
 static const double throughput_delta = 0.5;
 
-static const double delta_0_1 = 0.1;
+static const double delta_5 = 5;
 
 int main(int argc, char *argv[])
 {
@@ -210,13 +210,13 @@ int main(int argc, char *argv[])
         {
             printf("sender: [tp=%f, del=%f]\n", x.first / run.first.link_ppt, x.second / run.first.delay);
             // norm_score += log2(x.first / run.first.link_ppt) - log2(x.second / run.first.delay);
-            new_score += log2(x.first / run.first.link_ppt) - delta_0_1*log2(x.second / run.first.delay);
+            new_score += log2(x.first / run.first.link_ppt) - delta_5*log2(x.second / run.first.delay);
             // throughput_norm_score += log2(x.first / run.first.link_ppt) - throughput_delta*log2(x.second / run.first.delay);
         }
     }
 
     // printf("normalized_score = %f\n", norm_score);
-    printf("normalized_score_delta_0_1 = %f\n", new_score);
+    printf("normalized_score_delta_5 = %f\n", new_score);
     // printf("normalized_score_delta_throughput = %f\n", throughput_norm_score);
 
     printf("Whiskers: %s\n", outcome.used_actions.str().c_str());
