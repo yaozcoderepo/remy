@@ -37,4 +37,8 @@ Makefile.in
 /src/scoring-example
 
 outputs/
+<<<<<<< HEAD
 tests/
+=======
+remycc**
+>>>>>>> main
