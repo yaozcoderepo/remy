@@ -38,3 +38,4 @@ Makefile.in
 
 outputs/
 tests/
+remycc*
