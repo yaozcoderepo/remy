@@ -14,6 +14,8 @@ static const double throughput_delta = 0.5;
 
 static const double delta_5 = 5;
 
+static const double delta_10 = 10;
+
 class Utility
 {
 private:
@@ -71,7 +73,7 @@ public:
         const double delay_penalty = log2(average_delay() / 100.0);
 
         // return throughput_utility - throughput_delta*delay_penalty;
-        return throughput_utility - delta_5*delay_penalty;
+        return throughput_utility - delta_10 * delay_penalty;
     }
 
     SimulationResultBuffers::UtilityData DNA() const
