@@ -39,3 +39,6 @@ Makefile.in
 outputs/
 tests/
 remycc**
+.vagrant/
+.vscode/
+.DS_Store
