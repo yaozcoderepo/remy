@@ -8,17 +8,17 @@
 class Exponential
 {
 private:
-  std::exponential_distribution<> distribution;
+    std::exponential_distribution<> distribution;
 
 public:
-  Exponential( const double & rate ) : distribution( rate ) {}
+    Exponential(const double &rate) : distribution(rate) {}
 
-  void set_lambda( const double & rate ) 
-  {
-  	distribution = std::exponential_distribution<> ( rate );
-  }
-  
-  double sample( PRNG & prng ) { return distribution( prng ); }
+    void set_lambda(const double &rate)
+    {
+        distribution = std::exponential_distribution<>(rate);
+    }
+
+    double sample(PRNG &prng) { return distribution(prng); }
 };
 
 #endif

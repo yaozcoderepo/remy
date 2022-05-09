@@ -4,8 +4,8 @@
 
 #include "random.hh"
 
-PRNG & global_PRNG( void )
+PRNG &global_PRNG(void)
 {
-  static PRNG generator( time( NULL ) ^ getpid() );
-  return generator;
+    static PRNG generator(time(NULL) ^ getpid());
+    return generator;
 }

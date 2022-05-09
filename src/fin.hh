@@ -8,50 +8,53 @@
 #include "action.hh"
 #include "dna.pb.h"
 
-class Fin : public Action {
+class Fin : public Action
+{
 private:
-  double _lambda;
+    double _lambda;
+
 public:
-  Fin( const Fin & other );
-  Fin( const double s_rate, const MemoryRange & s_domain ) : Action( s_domain ), _lambda( s_rate) {};
-  Fin( const MemoryRange & s_domain ) : Fin( get_optimizer().lambda.default_value, s_domain ) {};
-  virtual ~Fin() {};
+    Fin(const Fin &other);
+    Fin(const double s_rate, const MemoryRange &s_domain) : Action(s_domain), _lambda(s_rate){};
+    Fin(const MemoryRange &s_domain) : Fin(get_optimizer().lambda.default_value, s_domain){};
+    virtual ~Fin(){};
 
-  const double & lambda( void ) const { return _lambda; }
-  
-  std::vector< Fin > next_generation( void ) const;
+    const double &lambda(void) const { return _lambda; }
 
-  std::string str( const unsigned int total=1 ) const;
+    std::vector<Fin> next_generation(void) const;
 
-  RemyBuffers::Fin DNA( void ) const;
-  Fin( const RemyBuffers::Fin & dna );
-  
-  void round( void );
-  
-  bool operator==( const Fin & other ) const { return (_lambda == other._lambda) && (_domain == other._domain); }
-  
-  friend size_t hash_value( const Fin & Fin );
+    std::string str(const unsigned int total = 1) const;
 
-  struct OptimizationSettings
-  {
-    OptimizationSetting< double > lambda;
+    RemyBuffers::Fin DNA(void) const;
+    Fin(const RemyBuffers::Fin &dna);
 
-    RemyBuffers::OptimizationSettings DNA( void ) const
+    void round(void);
+
+    bool operator==(const Fin &other) const { return (_lambda == other._lambda) && (_domain == other._domain); }
+
+    friend size_t hash_value(const Fin &Fin);
+
+    struct OptimizationSettings
     {
-      RemyBuffers::OptimizationSettings ret;
+        OptimizationSetting<double> lambda;
 
-      ret.mutable_lambda()->CopyFrom( lambda.DNA() );
+        RemyBuffers::OptimizationSettings DNA(void) const
+        {
+            RemyBuffers::OptimizationSettings ret;
 
-      return ret;
-    }
-  };
+            ret.mutable_lambda()->CopyFrom(lambda.DNA());
 
-  static const OptimizationSettings & get_optimizer( void ) {
-    static OptimizationSettings default_settings {
-      { 0.01, 30,   0.01, 3,   4, 5 },  /* lambda */
+            return ret;
+        }
     };
-    return default_settings;
-  }
+
+    static const OptimizationSettings &get_optimizer(void)
+    {
+        static OptimizationSettings default_settings{
+            {0.01, 30, 0.01, 3, 4, 5}, /* lambda */
+        };
+        return default_settings;
+    }
 };
 
 #endif

@@ -13,41 +13,44 @@
 class Rat
 {
 private:
-  const WhiskerTree & _whiskers;
-  Memory _memory;
+    const WhiskerTree &_whiskers;
+    Memory _memory;
 
-  unsigned int _packets_sent, _packets_received;
+    unsigned int _packets_sent, _packets_received;
 
-  bool _track;
+    bool _track;
 
-  double _last_send_time;
+    double _last_send_time;
 
-  int _the_window;
-  double _intersend_time;
+    int _the_window;
+    double _intersend_time;
 
-  unsigned int _flow_id;
-  int _largest_ack;
+    unsigned int _flow_id;
+    int _largest_ack;
 
 public:
-  Rat( WhiskerTree & s_whiskers, const bool s_track=false );
+    Rat(WhiskerTree &s_whiskers, const bool s_track = false);
 
-  void packets_received( const std::vector< Packet > & packets );
-  void reset( const double & tickno ); /* start new flow */
+    void packets_received(const std::vector<Packet> &packets);
+    void reset(const double &tickno); /* start new flow */
 
-  template <class NextHop>
-  void send( const unsigned int id, NextHop & next, const double & tickno,
-	     const unsigned int packets_sent_cap = std::numeric_limits<unsigned int>::max() );
+    template <class NextHop>
+    void send(const unsigned int id, NextHop &next, const double &tickno,
+              const unsigned int packets_sent_cap = std::numeric_limits<unsigned int>::max());
 
-  const WhiskerTree & whiskers( void ) const { return _whiskers; }
+    const WhiskerTree &whiskers(void) const { return _whiskers; }
 
-  Rat & operator=( const Rat & ) { assert( false ); return *this; }
+    Rat &operator=(const Rat &)
+    {
+        assert(false);
+        return *this;
+    }
 
-  double next_event_time( const double & tickno ) const;
+    double next_event_time(const double &tickno) const;
 
-  const unsigned int & packets_sent( void ) const { return _packets_sent; }
+    const unsigned int &packets_sent(void) const { return _packets_sent; }
 
-  SimulationResultBuffers::SenderState state_DNA() const;
-
+    SimulationResultBuffers::SenderState state_DNA() const;
 };
 
 #endif
