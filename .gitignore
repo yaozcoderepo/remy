@@ -37,4 +37,5 @@ Makefile.in
 /src/scoring-example
 
 outputs/
-remycc**
+remycc*
+.vscode/
