@@ -1,31 +1,32 @@
-# Remy
+# Testing Environment Setup
 
-This code (`main branch`) is directly forked from [this](https://github.com/tcpexmachina/remy)
+-   To reproduce the results from our project report, first download [remy-reproduce-1.0.tar.gz](https://web.mit.edu/remy/remy-reproduce-1.0.tar.gz) to the root directory
+-   Uncompress it by running `tar zxvf remy-reproduce-1.0.tar.gz`
+-   Inside the root directory, build a docker image by running `docker build -t network .`
+-   Start a container from this created image by running `docker run -it --name=project --net=host network bash`
+-   Then,
 
-Then for our experiments, we modify the remy code in the following branch:
+    ```bash
+    cd /app/remy-reproduce-1.0
+    ./install
 
--   For memory modification, refer to `test-min-rtt`, `test-rtt-ewma`, `test-slow-rtt-ewma`, `test-slow-send-ewma` branches
--   For action modification, refer to `change-action` branch
--   For objective function experiment, refer to `remy-delta-*` branches
--   For design range experiment, you need to change `src/config.sh` file to different setting based on the report, and the other parts remain the same as the `main` branch
+    # Then
+    # move all remycc algorithm files from the provided `dna` directory
+    # to `/app/remy-reproduce-1.0/ns-2.35/tcl/ex/congctrl` directory
+    # inside the container using `docker cp` command
 
-Basically, this code serve as a base case for our network project
+    # move all scripts from the provided `scripts` directory to
+    # `/app/remy-reproduce-1.0/ns-2.35/tcp/remy/rats/new` directory
+    # inside the container using `docker cp` command as well
 
-To compile this code, navigate to the root directory of the repository
+    cd /app/remy-reproduce-1.0/ns-2.35/tcl/ex/congctrl
+    chmod 700 run-figure-*
 
-```bash
-./autogen.sh
-./configure
-make
+    # if you want to reproduce the memory modification experiment in our project
+    ./run-figure-memory
 
-cd src
-./config.sh
-mkdir outputs
-./remy cf="testing.cfg" of="outputs/remycc"
-```
-
-Then you would get trained RemyCC algorithm files in `outputs` folder.
-
-For environment, we use VirtualBox together with Vagrant to set up VM. For more specific step, go to `train-vm` branch.
-
-For testing, please refer to `test-ns` branch
+    # after 5-10 min
+    cd ../graphing-scripts
+    # run the command below and you will get the graph showing the result
+    ./graphmaker ../congctrl/results/
+    ```

@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Cwd;
+
+my $dir = getcwd;
+
+my $whiskerdir = $dir . q{/../../../tcp/remy/rats/new/};
+
+for my $nsrc ( 8 ) { # maximum degree of multiplexing
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell  -p TCP/Newreno -n $nsrc &};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell  -p TCP/Linux/cubic -n $nsrc &};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell  -p TCP/Linux/compound -n $nsrc &};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell  -p TCP/Vegas -n $nsrc &};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell  -p TCP/Reno/XCP -n $nsrc &};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell  -p Cubic/sfqCoDel -n $nsrc &};
+
+    $ENV{'WHISKERS'} = $whiskerdir . q{remycc_origin.dna};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell-rational-deltaorig  -p TCP/Rational -n $nsrc &};
+
+    $ENV{'WHISKERS'} = $whiskerdir . q{remycc_min_rtt.dna};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell-rational-deltamrtt  -p TCP/Rational -n $nsrc &};
+
+    $ENV{'WHISKERS'} = $whiskerdir . q{remycc_rtt_ewma.dna};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell-rational-deltartte  -p TCP/Rational -n $nsrc &};
+
+    $ENV{'WHISKERS'} = $whiskerdir . q{remycc_slow_rtt_ewma.dna};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell-rational-deltaslrtte  -p TCP/Rational -n $nsrc &};
+
+    $ENV{'WHISKERS'} = $whiskerdir . q{remycc_slow_send_ewma.dna};
+    system qq{python runremy.py -c remyconf/dumbbell-buf1000-rtt150-bneck15.tcl -d results/Dumbbell-rational-deltaslsende  -p TCP/Rational -n $nsrc &};
+}
